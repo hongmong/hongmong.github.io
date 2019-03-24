@@ -15,7 +15,7 @@ type: page
 
 ## 联系我
 
-* GitHub：[Gaohaoyang](https://github.com/hongmong)
+* GitHub：[hongmong](https://github.com/hongmong)
 * email：hongmongking@163.com
 
 ## 关于本站
