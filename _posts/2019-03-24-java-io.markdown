@@ -1,0 +1,94 @@
+[TOC]
+#### 前言
+
+本文中的IO并非是对存储介质的I/O操作，而是在网络通讯中的网络模型
+
+#### BIO（同步阻塞IO）
+
+在JDK 1.4 之前，我们建立网络连接是采用的BIO模式，首先在服务端启动一个SocketServer，然后在客户端启动Socket对服务端进行通讯，默认情况下需要对每一个请求建立一个对应的线程来处理这个请求。
+
+> 服务端
+
+```java
+public static void main(String[] args) throws IOException {
+        // 监听的端口
+        int port = 8080;
+        if(args != null && args.length > 0){
+            try {
+                port = Integer.valueOf(args[0]);
+            }catch (NumberFormatException e){
+            }
+        }
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(port);
+            Socket socket = null;
+            while (true){
+                // 如果客户端没有没有连接阻塞
+                socket = serverSocket.accept();
+                /*:
+                 * 在这里处理连接有几种方式
+                 * 1：使用主线程处理连接
+                 * 2：每次有新的连接时，创建一个新的线程处理请求
+                 * 3：创建一个线程池，做到线程的复用，节省线程频繁创建销毁的开销
+                 */
+                new Thread(new TimeServerHandle(socket)).start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(serverSocket != null){
+                System.out.println("The time server close");
+                serverSocket.close();
+            }
+        }
+    }
+```
+
+> 服务端处理代码
+
+```java
+public class TimeServerHandle implements Runnable {
+
+    private Socket socket;
+    public TimeServerHandle(Socket socket){
+        this.socket = socket;
+    }
+    @Override
+    public void run() {
+        BufferedReader in = null;
+        PrintWriter out = null;
+        try {
+            in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+            out = new PrintWriter(this.socket.getOutputStream());
+            String body = null;
+            while (true){
+                body = in.readLine();
+                if(body == null){
+                    break;
+                }
+                System.out.println("The time server receive :" + body);
+            }
+            out.println(System.currentTimeMillis());
+            out.flush();
+            in.close();
+            out.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+可见每次有新的连接时，服务端都会创建新的线程。这种模式无法满足高并发、高性能的场景。
+
+#### NIO
+
+
+#### AIO
+
+#### Netty
+
+
+
