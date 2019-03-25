@@ -16,6 +16,7 @@ mathjax: true
 * AQS支持exclusive和share两种模式
 ***
 #### 使用Demo
+
 ```java
 public class AQSDemo {
     private final Sync sync = new Sync();
