@@ -7,7 +7,7 @@
 
 # Site settings
 title: Homon
-brief-intro: Front-end Dev Engineer
+brief-intro: "NULL"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://hongmong.github.io" # the base hostname & protocol for your site
 
