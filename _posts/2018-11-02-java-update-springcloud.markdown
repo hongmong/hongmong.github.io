@@ -1,9 +1,9 @@
 ---
 layout: post
 title:  "SpringCloud架构升级"
-date:   2019-03-24 08:08:08
+date:   2018-11-02 08:08:08
 categories: framework
-tags: java spingcloud 微服务
+tags: java springcloud 微服务
 excerpt: 农田管家后端服务架构升级
 mathjax: true
 ---

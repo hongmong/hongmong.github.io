@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "java中的AQS"
+title:  "Java中的AQS"
 date:   2019-01-17 08:08:08
 categories: java
 tags: 多线程 锁 并发
