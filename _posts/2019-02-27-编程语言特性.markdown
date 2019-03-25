@@ -1,0 +1,45 @@
+---
+layout: post
+title:  "编程语言的语言特性"
+date:   2019-02-27 08:08:08
+categories: language
+tags: language
+excerpt: 编程语言的语言特性
+mathjax: true
+---
+
+[TOC]
+#### 前言
+最近读了王垠的博客，当中有一篇文章讲述如何快速掌握所有的编程语言。重点提到了语言特性这个术语，我也对这个名词产生了较大的兴趣，打算花费一些时间梳理一番
+##### CE（checked exception）
+首先，我们来认识一下什么是CE
+
+```java
+void foo (String filename) throws FileNotFoundException{
+    if (...) {
+        throw FileNotFoundException();
+    }
+    ...
+}
+```
+在编写上述代码时，如果你在代码中手动抛出了一个异常，Java编译时要求你必须在函数头部写上“throw FileNotFoundException”否则它就不能编译。这个声明表明此函数在某些情况下回发生FileNotFoundException异常。在使用foo函数时，你必须针对这种异常做try/catch处理，或者在调用者的头部也同样声明“throw FileNotFoundException”，把这个异常传递给上层的调用者。
+```java
+try {
+    foo("xxx");
+} catch (FileNotFoundException e){
+    // 异常处理
+}
+```
+对异常的声明和检查，叫做“check Exception”。很多语言（C++、C#、JavaScript、Python）都有异常机制，但它们不要求在函数的类型里面声明可能出现的异常类型，也不使用静态类型系统对异常进行检查和验证。我们说这些系统中有“Exception” 但没有“check Exception”
+[异常](https://app.yinxiang.com/shard/s72/nl/16065923/41e22719-0958-4bda-94f8-cef133e5c65a)
+
+##### 泛型
+泛型（Generic）是Java SE 1.5的新特性，泛型的本质是参数化类型，也就是说所操作的数据类型被指定为一个参数，通俗来说就是“类型的变量”。
+>List<String> list = new ArrayList<String>();
+
+在定义List的时候我们把类型（String）当做一个参数
+##### lambda表达式
+
+##### 类型推导
+
+##### 静态类型系统

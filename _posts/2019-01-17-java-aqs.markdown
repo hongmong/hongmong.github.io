@@ -1,0 +1,291 @@
+---
+layout: post
+title:  "java中的AQS"
+date:   2019-01-17 08:08:08
+categories: java
+tags: 多线程 锁 并发
+excerpt: java中的AQS
+mathjax: true
+---
+
+[TOC]
+### 概述
+谈到并发，不得不谈到ReretrantLock，又得谈的AbstractQueueSynchronized（AQS）。AQS是一个用来构建锁和同步器的框架，使用AQS能简单和快速的构建出应用广泛的同步器。
+* AQS的实现使基于FIFO的等待队列
+* 使用单个原子变量来表示获取、释放锁状态（final int），改变该值使用的是CAS
+* AQS支持exclusive和share两种模式
+***
+#### 使用Demo
+```java
+public class AQSDemo {
+    private final Sync sync = new Sync();
+    /**
+     * 加锁操作，acquire会调用我们重写的tryAcquire方法
+     */
+    public  void lock(){
+        sync.acquire(1);
+    }
+
+    public void unLock(){
+        sync.release(0);
+    }
+    /**
+     * 是否锁定中
+     * @return
+     */
+    public boolean isLock(){
+        return sync.isHeldExclusively();
+    }
+
+    public static class Sync extends AbstractQueuedSynchronizer{
+        /**
+         * 尝试获取锁，当state未0时，CAS操作成功，state变为1
+         * @param arg
+         * @return
+         */
+        @Override
+        protected boolean tryAcquire(int arg) {
+            if(compareAndSetState(0,1)){
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
+            }
+            return false;
+        }
+        /**
+         * 是否处于占用状态
+         * @return
+         */
+        @Override
+        protected boolean isHeldExclusively() {
+            return getState() == 1;
+        }
+        /**
+         * 尝试释放锁
+         * @param arg
+         * @return
+         */
+        @Override
+        protected boolean tryRelease(int arg) {
+            if(getState() == 0){
+                throw new IllegalMonitorStateException();
+            }
+            setExclusiveOwnerThread(null);
+            setState(0);
+            return true;
+        }
+    }
+}
+```
+### FIFO队列
+AQS维护一个共享资源state，通过内置的FIFO（First input first output）来完成资源线程的排队工作。等待队列是CLH（Craig、Landin and Hagersten）锁队列。该队列由一个一个的Node节点组成，每个NOde维护一个prev和next引用，分别指向自己的前驱和后置节点。AQS维护两个指针，指向head头部和tail尾部节点
+
+![avatar](image/2019-03-25 095302.png)
+
+其实就是个双端双向链表，当线程获取资源失败，会被构造成一个Node加入到CLH队列中，同事当前线程会被阻塞在队列中（通过LockSupport.park()，其实是锁等待）。当持有同步状态的线程释放时，会唤醒后续节点线程，然后此节点继续加入到同步状态的争夺中。
+#### Node节点
+Node对象是AbstractQueueSynchronizer的一个静态内部类
+```java
+static final class Node {
+    /** Marker to indicate a node is waiting in shared mode */
+    static final Node SHARED = new Node();
+    /** Marker to indicate a node is waiting in exclusive mode */
+    static final Node EXCLUSIVE = null;
+    /** waitStatus value to indicate thread has cancelled 
+     * waitStatus值，表示线程已被取消
+     */
+    static final int CANCELLED =  1;
+    /** waitStatus value to indicate successor's thread needs unparking 
+     * 表示线程需要被唤醒
+     */
+    static final int SIGNAL    = -1;
+    /** waitStatus value to indicate thread is waiting on condition */
+    static final int CONDITION = -2;
+    /** * waitStatus value to indicate the next acquireShared should * unconditionally propagate */
+    static final int PROPAGATE = -3;
+    volatile int waitStatus;
+    /** 当前节点的前驱节点*/
+    volatile Node prev;
+    /** 当前节点的后置节点*/
+    volatile Node next;
+    /** 执行的线程*/
+    volatile Thread thread;
+}
+```
+### 源码
+* acquire()方法
+```java
+public final void acquire(int arg) {
+// tryAcquire尝试获取锁，如果获取成功直接返回
+// 获取失败，addWaiter添加一个节点到尾部
+if (!tryAcquire(arg) &&
+        acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
+    selfInterrupt();
+}
+
+```
+
+1. 首先调用重写的tryAcquire方法，返回true说明获取锁成功，后面的逻辑不在执行。若获取失败，则执行2步骤
+2. 获取同步状态失败，构造独占式同步节点，通过addWaiter添加节点到队列的尾部
+3. 该节点在队列中尝试获取同步状态，若获取不到，则阻塞节点线程，知道被前驱节点唤醒或者被中断。
+* addWaiter()
+```java
+/**
+ * 添加Node节点到队列的尾部
+ */
+private Node addWaiter(Node mode) {
+    Node node = new Node(Thread.currentThread(), mode);
+    // Try the fast path of enq; backup to full enq on failure
+    Node pred = tail;
+    //如果尾部节点不为空，CAS快速在队列尾部添加，返回
+    if (pred != null) {
+        node.prev = pred;
+        if (compareAndSetTail(pred, node)) {
+            pred.next = node;
+            return node;
+        }
+    }
+    enq(node);
+    return node;
+}
+```
+compareAndSetTail方法目的是为了，在线程安全的情况下，添加节点到尾部
+* enq()
+```java
+private Node enq(final Node node) {
+    for (;;) {
+        Node t = tail;
+        //如果队列是空的，创建一个节点并使head和tail指针指向这个节点
+        if (t == null) { // Must initialize
+            if (compareAndSetHead(new Node()))
+                tail = head;
+        } else {
+            node.prev = t;
+            if (compareAndSetTail(t, node)) {
+                t.next = node;
+                return t;
+            }
+        }
+    }
+}
+```
+enq方法内部是一个死循环，同步CAS设置尾部节点，不成功就一直重试。这是一个CAS自旋的用法
+* acquireQueue()
+```java
+final boolean acquireQueued(final Node node, int arg) {
+    boolean failed = true;
+    try {
+        boolean interrupted = false;
+        for (;;) {
+            // 获取当前节点的前驱节点
+            final Node p = node.predecessor();
+            // 如果该节点的前驱节点是头部节点，才尝试获取锁，其他情况是没有机会获取tryAcquire的
+            if (p == head && tryAcquire(arg)) {
+                //获取成功后，将当前节点设置为头部节点
+                setHead(node);
+                //方便GC
+                p.next = null; // help GC
+                failed = false;
+                return interrupted;
+            }
+            // 如果没有获取到同步状态，shouldParkAfterFailedAcquire判断是否应该阻塞，parkAndCheckInterrupt用来阻塞线程
+            if (shouldParkAfterFailedAcquire(p, node) &&
+                parkAndCheckInterrupt())
+                interrupted = true;
+        }
+    } finally {
+        // 排队失败，取消排队
+        if (failed)
+            cancelAcquire(node);
+    }
+}
+```
+acquireQueue内部也是一个死循环
+* shouldParkAfterFailedAcquire()
+```java
+private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
+// 获取前驱的wait值
+int ws = pred.waitStatus;
+// 如果wait值等于Node.SIGNAL（-1）则说明可以安全的挂起线程
+if (ws == Node.SIGNAL)
+    /*
+     * This node has already set status asking a release
+     * to signal it, so it can safely park.
+     */
+    return true;
+if (ws > 0) {
+    /*
+     * Predecessor was cancelled. Skip over predecessors and
+     * indicate retry.
+     * 前驱节点的wait值为CANCEL状态，跳过前驱节点，从后向前遍历，直到找到一个wait值正常的节点，并把当前节点设置为它的后置节点
+     */
+    do {
+        node.prev = pred = pred.prev;
+    } while (pred.waitStatus > 0);
+    pred.next = node;
+} else {
+    /*
+     * waitStatus must be 0 or PROPAGATE.  Indicate that we
+     * need a signal, but don't park yet.  Caller will need to
+     * retry to make sure it cannot acquire before parking.
+     * 如果前驱节点为其他状态，将其设置为CANCEL状态
+     */
+    compareAndSetWaitStatus(pred, ws, Node.SIGNAL);
+}
+return false;
+}
+```
+如果shouldParkAfterFailedAcquire返回true，也就是当前节点的前驱节点为SIGNAL状态，则说明当前节点可以安全的进入park状态了。
+* parkAndCheckInterrupt()
+```java
+private final boolean parkAndCheckInterrupt() {
+    // 使用park方法，将当前线程挂起
+    LockSupport.park(this);
+    // 返回当前线程是否被中断
+    return Thread.interrupted();
+}
+```
+* release()
+```java
+public final boolean release(int arg) {
+    // 尝试释放，释放成功后，将后续节点唤醒
+    if (tryRelease(arg)) {
+        Node h = head;
+        if (h != null && h.waitStatus != 0)
+            unparkSuccessor(h);
+        return true;
+    }
+    return false;
+}
+```
+* unparkSuccessor()
+```java
+private void unparkSuccessor(Node node) {
+    /*
+     * If status is negative (i.e., possibly needing signal) try
+     * to clear in anticipation of signalling.  It is OK if this
+     * fails or if status is changed by waiting thread.
+     */
+    int ws = node.waitStatus;
+    if (ws < 0)
+        compareAndSetWaitStatus(node, ws, 0);
+
+    /*
+     * Thread to unpark is held in successor, which is normally
+     * just the next node.  But if cancelled or apparently null,
+     * traverse backwards from tail to find the actual
+     * non-cancelled successor.
+     */
+    Node s = node.next;
+    // 如果当前节点的后续节点，等于空，或者wait状态为CANCEL
+    if (s == null || s.waitStatus > 0) {
+        s = null;
+        // 从队列的tail开始遍历，选取一个wait状态正常的节点唤醒
+        for (Node t = tail; t != null && t != node; t = t.prev)
+            if (t.waitStatus <= 0)
+                s = t;
+    }
+    if (s != null)
+        // 唤醒后续节点的线程
+        LockSupport.unpark(s.thread);
+}
+```
