@@ -1,10 +1,10 @@
 ---
 layout: post
 title:  "Java中的BIO、NIO、AIO"
-date:   2019-03-24 15:14:54
+date:   2019-03-24 08:08:08
 categories: java
-tags: java NIO
-excerpt: Java中的BIO、NIO、AIO
+tags: java nio
+excerpt: 本文中的IO并非是对存储介质的I/O操作，而是在网络通讯中的网络模型
 mathjax: true
 ---
 

@@ -4,7 +4,7 @@ title:  "java中的AQS"
 date:   2019-01-17 08:08:08
 categories: java
 tags: 多线程 锁 并发
-excerpt: java中的AQS
+excerpt: 谈到并发，不得不谈到ReretrantLock，又得谈的AbstractQueueSynchronized（AQS）。AQS是一个用来构建锁和同步器的框架，使用AQS能简单和快速的构建出应用广泛的同步器。
 mathjax: true
 ---
 
@@ -79,7 +79,7 @@ public class AQSDemo {
 ### FIFO队列
 AQS维护一个共享资源state，通过内置的FIFO（First input first output）来完成资源线程的排队工作。等待队列是CLH（Craig、Landin and Hagersten）锁队列。该队列由一个一个的Node节点组成，每个NOde维护一个prev和next引用，分别指向自己的前驱和后置节点。AQS维护两个指针，指向head头部和tail尾部节点
 
-![avatar](image/2019-03-25 095302.png)
+![avatar](https://github.com/hongmong/hongmong.github.io/blob/master/_posts/image/2019-03-25%20095302.png?raw=true)
 
 其实就是个双端双向链表，当线程获取资源失败，会被构造成一个Node加入到CLH队列中，同事当前线程会被阻塞在队列中（通过LockSupport.park()，其实是锁等待）。当持有同步状态的线程释放时，会唤醒后续节点线程，然后此节点继续加入到同步状态的争夺中。
 #### Node节点
