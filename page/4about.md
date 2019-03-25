@@ -26,4 +26,4 @@ type: page
 
 ## Comments
 
-{% include comments.html %}
+<!-- {% include comments.html %} -->
