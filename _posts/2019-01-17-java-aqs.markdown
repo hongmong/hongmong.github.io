@@ -117,7 +117,6 @@ static final class Node {
 ```
 ### 源码
 * acquire()方法
-
 ```java
 public final void acquire(int arg) {
 // tryAcquire尝试获取锁，如果获取成功直接返回
@@ -154,6 +153,7 @@ private Node addWaiter(Node mode) {
 }
 ```
 compareAndSetTail方法目的是为了，在线程安全的情况下，添加节点到尾部
+
 * enq()
 ```java
 private Node enq(final Node node) {
@@ -174,6 +174,7 @@ private Node enq(final Node node) {
 }
 ```
 enq方法内部是一个死循环，同步CAS设置尾部节点，不成功就一直重试。这是一个CAS自旋的用法
+
 * acquireQueue()
 ```java
 final boolean acquireQueued(final Node node, int arg) {
@@ -205,8 +206,8 @@ final boolean acquireQueued(final Node node, int arg) {
 }
 ```
 acquireQueue内部也是一个死循环
-* shouldParkAfterFailedAcquire()
 
+* shouldParkAfterFailedAcquire()
 ```java
 private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
 // 获取前驱的wait值
@@ -241,6 +242,7 @@ return false;
 }
 ```
 如果shouldParkAfterFailedAcquire返回true，也就是当前节点的前驱节点为SIGNAL状态，则说明当前节点可以安全的进入park状态了。
+
 * parkAndCheckInterrupt()
 ```java
 private final boolean parkAndCheckInterrupt() {
@@ -264,7 +266,6 @@ public final boolean release(int arg) {
 }
 ```
 * unparkSuccessor()
-
 ```java
 private void unparkSuccessor(Node node) {
     /*
