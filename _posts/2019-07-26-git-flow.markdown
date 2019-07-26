@@ -1,0 +1,19 @@
+---
+layout: post
+title:  "Git工作流"
+date:   2019-07-26 08:08:08
+categories: framework
+tags: git
+excerpt: Git分支管理模型
+mathjax: true
+---
+
+![avatar](https://github.com/hongmong/hongmong.github.io/blob/master/_posts/image/2019-07-26%20105800.png?raw=true)
+
+- dev_1.x.0：每一次正常代码迭代分支名称
+- dev_1.x.x_timestmap：每一次临时修复bug分支名称
+- stg_1.x.0/x：预发布环境分支名称
+- b_1.x.0/x_timestamp：迭代过程提测时tag名称
+- s_1.x.0/x_timestamp：预发布环境tag名称
+- r_1.x.0：正常迭代分支合并master的tag名称
+- t_1.x.x_tiemstamp：临时bug修复合并master的tag名称
