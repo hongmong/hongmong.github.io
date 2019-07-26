@@ -117,6 +117,7 @@ static final class Node {
 ```
 ### 源码
 * acquire()方法
+
 ```java
 public final void acquire(int arg) {
 // tryAcquire尝试获取锁，如果获取成功直接返回
@@ -127,7 +128,6 @@ if (!tryAcquire(arg) &&
 }
 
 ```
-
 1. 首先调用重写的tryAcquire方法，返回true说明获取锁成功，后面的逻辑不在执行。若获取失败，则执行2步骤
 2. 获取同步状态失败，构造独占式同步节点，通过addWaiter添加节点到队列的尾部
 3. 该节点在队列中尝试获取同步状态，若获取不到，则阻塞节点线程，知道被前驱节点唤醒或者被中断。
@@ -205,6 +205,7 @@ final boolean acquireQueued(final Node node, int arg) {
 ```
 acquireQueue内部也是一个死循环
 * shouldParkAfterFailedAcquire()
+
 ```java
 private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
 // 获取前驱的wait值
@@ -262,6 +263,7 @@ public final boolean release(int arg) {
 }
 ```
 * unparkSuccessor()
+
 ```java
 private void unparkSuccessor(Node node) {
     /*
