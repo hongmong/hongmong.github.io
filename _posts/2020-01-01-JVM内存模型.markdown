@@ -1,0 +1,60 @@
+---
+layout: post
+title:  "JVM内存模型"
+date:   2020-05-17 08:08:08
+categories: java
+tags: java jvm
+excerpt: JVM内存模型  栈（Stack） 堆（Heap） 方法区 GC
+mathjax: false
+---
+
+* content
+{:toc}
+
+## 栈（Stack）
+
+#### 虚拟机栈
+每个线程都有一个私有的栈，随着线程创建而创建。栈里存放一个叫做“栈帧”的东西，每个方法会创建一个栈帧，栈帧中存放局部变量、操作数栈、方法出口等信息
+
+#### 本地方法栈
+主要与JVM的Native方法有关
+#### PC寄存器
+
+## 堆（Heap）
+
+#### 新生代
+主要用来存放新创建的对象。又分为：
+- Eden区：Java新对象的出生地（如果对象占用内存过大，则直接分配到老年代）。当Eden内存不够后会触发MinorGC
+- SurvivorTo: 保留一次MinorGC过程中的幸存者
+- SurvivorFrom：上一次MinorGC的幸存者，作为这一次GC的被扫描着
+
+#### 老年代
+
+
+
+#### 元数据（永久代）
+指内存的永久保存区域，主要存放Class和Meta（元数据）
+在Java8中，永久代已被一处，被元数据区所取代；元空间和永久代类似，都是对JVM规范中的方法区的实现，区别在于元空间在本地内存中而不在虚拟机中
+
+## 方法区
+
+主要用来保存被加载过的类的信息、static变量信息
+
+## GC
+
+#### MinorGC
+
+过程：
+- 首先将Eden和SurvivorFrom中的存活的对象复制到SurvivorTo中（如果有对象的年龄达到15，则复制到老年代）
+- 将这些对象的年龄加1（如果SurvivorTo空间不足则放到老年区）
+- 然后清空Eden和SurvivorFrom区；最后SurvivorTo和SurvivorFrom区域互换
+
+#### MajorGC
+当年老代空间不够用的时候，虚拟机会使用“标记—清除”或者“标记—整理”算法
+
+#### FullGC
+触发机制：
+- 调用System.gc，系统建议执行FullGC但是不一定执行
+- 老年代空间不足
+- 方法去空间不足
+- 通过MinorGC进入老年代的平均大小大于老年代的可用内存

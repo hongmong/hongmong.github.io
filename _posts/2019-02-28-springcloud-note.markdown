@@ -5,7 +5,7 @@ date:   2019-02-28 08:08:08
 categories: framework
 tags: java springcloud 微服务
 excerpt: SpringCloud学习笔记及常用配置
-mathjax: true
+mathjax: false
 ---
 
 * content

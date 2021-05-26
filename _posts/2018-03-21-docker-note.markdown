@@ -3,9 +3,9 @@ layout: post
 title:  "Docker学习笔记"
 date:   2018-03-21 08:08:08
 categories: linux
-tags: docker
+tags: linux docker
 excerpt: Docker安装及常用命令
-mathjax: true
+mathjax: false
 ---
 
 * content

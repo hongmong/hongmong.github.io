@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Collections
+title: 收藏
 permalink: /collection/
 icon: bookmark
 type: page
@@ -13,4 +13,3 @@ type: page
 
 ## Comments
 
-<!-- {% include comments.html %} -->

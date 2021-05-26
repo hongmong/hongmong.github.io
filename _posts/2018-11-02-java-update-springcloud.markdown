@@ -5,7 +5,7 @@ date:   2018-11-02 08:08:08
 categories: framework
 tags: java springcloud 微服务
 excerpt: 农田管家后端服务架构升级
-mathjax: true
+mathjax: false
 ---
 
 * content

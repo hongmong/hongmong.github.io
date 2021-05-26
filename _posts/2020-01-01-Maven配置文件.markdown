@@ -1,0 +1,132 @@
+---
+layout: post
+title:  "Maven配置文件"
+date:   2020-02-17 08:08:08
+categories: java
+tags: maven
+excerpt: Maven配置文件常用配置
+mathjax: false
+---
+
+* content
+{:toc}
+
+### 版本发布
+
+- snapshots：开发过程中的仓库
+- release：正式发布的仓库
+- public：maven主库
+- 3rd party：第三方jar
+- 
+
+### Setting.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <!--本地仓库的地址-->
+    <localRepository>E:\MavenRepo</localRepository>
+    <!--maven在进行项目构建时是否允许maven进行联网下载所需要的信息，如果服务器不能连接远程仓库，可以设置为True-->
+    <offline>false</offline>
+    <!--私服发布的账号密码-->
+    <servers>
+        <server>
+            <!--server的ID，需要与distributionManagement中repository元素的id相匹配-->
+            <id>nexus</id>
+            <username>admin</username>
+            <password>admin123</password>
+        </server>
+    </servers>
+    <!--配置仓库镜像-->
+    <mirrors>
+        <mirror>
+            <id>aliyun</id>
+            <name>aliyun maven repo</name>
+            <mirrorOf>central</mirrorOf>
+            <url>http://192.168.0.222:8081/repository/maven-public/</url>
+        </mirror>
+        <mirror>
+            <id>aliyun</id>
+            <name>aliyun maven repo</name>
+            <!--被镜像的服务器ID，如果我们设置一个Maven中央仓库的镜像（http://repo.maven.apache.org/maven2/）,就需要设置为central，对应repository的ID-->
+            <!--<mirrorOf>central</mirrorOf>-->
+            <!--匹配所有的仓库请求，将所有的仓库请求都转到该镜像上-->
+            <mirrorOf>*</mirrorOf>
+            <!--nexus,repo2的仓库请求-->
+            <!--<mirrorOf>nexus,repo2</mirrorOf>-->
+            <!--匹配除了repo1仓库外的所有请求-->
+            <!--<mirrorOf>*,!nexus</mirrorOf>-->
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </mirror>
+    </mirrors>
+    
+    <!--配置先从aliyun下载，没有再去私服下载-->
+    <profiles>
+        <!--私服配置-->
+        <profile>
+            <id>nexus</id>
+                <repositories>
+                    <repository>
+                        <id>nexus</id>
+                        <url>http://192.168.0.222:8081/repository/maven-public/</url>
+                        <releases>
+                            <enabled>true</enabled>
+                            <!--更新发生的频率，maven会比较本地和远程仓库的时间戳。alway（一直）daily（每日）interval:n（每隔n分钟）never（从不）-->
+                            <!--<updatePolicy>always</updatePolicy>-->
+                            <!--当maven校验文件失败时怎么做ignore（忽略）fail（失败）warn（警告）-->
+                            <!--<checksumPolicy>warn</checksumPolicy>-->
+                        </releases>
+                        <snapshots>
+                            <enabled>true</enabled>
+                        </snapshots>
+                    </repository>
+                </repositories>
+                <pluginRepositories>
+                    <pluginRepository>
+                        <id>nexus</id>
+                        <url>http://192.168.0.222:8081/repository/maven-public/</url>
+                        <releases>
+                            <enabled>true</enabled>
+                        </releases>
+                        <snapshots>
+                            <enabled>true</enabled>
+                        </snapshots>
+                    </pluginRepository>
+                </pluginRepositories>
+        </profile>
+        <!--阿里云配置-->
+        <profile>
+            <id>aliyun</id>
+            <repositories>
+                <repository>
+                    <id>aliyun</id>
+                    <name>aliyun maven</name>
+                    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>aliyun</id>
+                    <name>aliyun maven</name>
+                    <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <!--激活配置-->
+    <activeProfiles>
+        <activeProfile>nexus</activeProfile>
+        <activeProfile>aliyun</activeProfile>
+    </activeProfiles>
+</settings>
+
+```

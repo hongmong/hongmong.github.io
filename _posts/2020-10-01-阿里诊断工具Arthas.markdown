@@ -1,0 +1,113 @@
+---
+layout: post
+title:  "阿里诊断工具Arthas"
+date:   2020-11-01 08:08:08
+categories: java
+tags: java jvm
+excerpt: 阿里诊断工具Arthas使用
+mathjax: false
+---
+
+* content
+{:toc}
+
+[Arthas首页](https://arthas.aliyun.com/)
+
+## 安装
+
+- 使用arthas-boot方式
+
+```
+# 下载Jar包
+curl -O https://arthas.aliyun.com/arthas-boot.jar
+# 启动
+java -jar arthas-boot.jar
+# 启动2 如果下载速度比较慢，可以使用aliyun的镜像
+java -jar arthas-boot.jar --repo-mirror aliyun --use-http
+```
+
+- 使用as.sh方式
+
+Linux/Unix/Mac系统可选择一键安装。上述命令会下载启动脚本文件 as.sh 到当前目录，直接在shell下面执行./as.sh，就会进入交互界面
+
+```
+curl -L https://arthas.aliyun.com/install.sh | sh
+```
+
+## 卸载
+
+- 在Linux/Unix/Mac平台
+
+```
+rm -rf ~/.arthas/
+rm -rf ~/logs/arthas
+```
+
+- Window删除用户home目录下的.arthas和log/arthas目录
+
+## 常用命令
+
+#### dashboard（进程以及内存使用信息）
+
+#### thread（线程栈信息）
+
+```
+打印线程ID 1 的栈信息
+thread 1
+```
+
+#### jad（反编译class）
+
+```
+jad com.cnknys.bu.controller.kuaidi.ExpressQueryController
+```
+
+#### watch（查看函数入参出参）
+
+
+```
+# 观察表达式 params：入参 returnObj：返回值 throwExp：异常 target：当前对象
+# 条件表达式 #cost>200,params[0].erpId==2520246
+# -n 观测次数
+# -x 遍历深度（默认1）
+# -e 方法异常之后观察
+# -b 方法调用之前观察
+# -s 方法返回之后观察
+# -f 方法结束之后（正常返回和异常返回）观察（默认）
+watch com.cnknys.bu.controller.drugs.DrugsApplyController drugsStoreList '{params,returnObj,throwExp}' '#cost>200,params[0].erpId==2520246' -n 2 -x 3
+```
+
+#### trace（方法内部调用路径，并输出方法路径上的每个节点上耗时）
+
+
+```
+# -E 开启正则表达式匹配，默认为通配符匹配
+# -n 观测次数
+# --skipJDKMethod false 默认trace不会包含JDK的函数调用，如果开启加入此参数
+# 条件过滤 #cost>100
+trace -E com.cnknys.bu.controller.drugs.DrugsApplyController drugsStoreList|platFormCheck '#cost>10' -n 3 --skipJDKMethod false
+```
+
+#### ognl（执行ognl表达式）
+
+```
+# 调用静态函数
+ognl '@java.lang.System@out.println("hello")'
+# 查看类的静态属性
+orgl '@demo.MathGame@random'
+# 执行多行表达式，赋值给临时变量，返回一个List
+ognl '#value1=@System@getProperty("java.home"), #value2=@System@getProperty("java.runtime.name"), {#value1, #value2}'
+```
+
+#### jvm（查看当前JVM信息）
+#### sysprop（查看修改JVM系统信息）
+#### sc（查看JVM已加载类的信息）
+
+```
+# -d 输出当前类的详细信息
+# -f 输出类的的成员变量信息（需要配合-d一起使用）
+# -x 遍历深度
+sc -d -f com.cnknys.bu.controller.drugs.DrugsApplyController -x 1
+```
+
+#### sm（查看已加载类的方法信息）

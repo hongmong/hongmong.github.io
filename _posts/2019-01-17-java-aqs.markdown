@@ -5,7 +5,7 @@ date:   2019-01-17 08:08:08
 categories: java
 tags: 多线程 锁 并发
 excerpt: 谈到并发，不得不谈到ReretrantLock，又得谈的AbstractQueueSynchronized（AQS）。AQS是一个用来构建锁和同步器的框架，使用AQS能简单和快速的构建出应用广泛的同步器。
-mathjax: true
+mathjax: false
 ---
 
 * content

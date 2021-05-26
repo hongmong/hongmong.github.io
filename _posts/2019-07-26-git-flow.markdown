@@ -5,7 +5,7 @@ date:   2019-07-26 08:08:08
 categories: framework
 tags: git
 excerpt: Git分支管理模型
-mathjax: true
+mathjax: false
 ---
 
 ![avatar](https://github.com/hongmong/hongmong.github.io/blob/master/_posts/image/2019-07-26%20105800.png?raw=true)

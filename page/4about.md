@@ -1,6 +1,6 @@
 ---
 layout: page
-title: About
+title: 关于
 permalink: /about/
 icon: heart
 type: page
@@ -11,7 +11,7 @@ type: page
 
 ## 关于我
 
-打铁还需自身硬
+NULL
 
 ## 联系我
 
@@ -25,5 +25,3 @@ type: page
 ### Update Log
 
 ## Comments
-
-<!-- {% include comments.html %} -->

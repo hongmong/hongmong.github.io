@@ -1,0 +1,263 @@
+---
+layout: post
+title:  "Redis安装及常用操作"
+date:   2020-03-17 08:08:08
+categories: redis
+tags: linux redis
+excerpt: Redis安装及常用操作
+mathjax: false
+---
+
+* content
+{:toc}
+
+### 安装
+
+```
+# 将下载好的redis压缩包解压
+tar -zxf redis**.tar.gz
+# 进入解压好的目录
+cd redis
+# 编译
+make
+# 安装
+make install PREFIX=/user/local/redis
+```
+
+需要gcc依赖
+```
+
+```
+
+### 常用命令
+
+```
+# 手动触发重写AOF文件
+bgrewriteaof
+# 异步保存数据到磁盘
+bgsave
+# 返回数据库里的key数量
+dbsize
+# 获取配置参数的值
+config get parameter
+# 设置配置文件
+config set parameter value
+# 获取服务器的详细信息
+info
+```
+
+
+### 常用配置
+
+```
+# 设置为yes启用守护进程
+daemonize no
+# 设置端口
+port 6379
+# 绑定的主机IP地址
+bind 127.0.0.1
+# 设置数据库的数量
+databases 16
+# 设置链接密码
+requirepass foobared
+
+# RDB 持久化配置，使用下方的规则持久化数据，当满足任一规则即可
+# 距离上一次持久时间超过900秒并且修改大于1持久化到磁盘
+save 900 1 
+# 距离上一次持久时间超过300秒并且修改大于10持久化到磁盘
+save 300 10
+# 距离上一次持久时间超过60秒并且修改大于10000持久化到磁盘
+save 60 10000
+# 指定本地数据库文件是否压缩
+rdbcompression yes
+# 指定本地数据库文件名称
+dbfilename dump.rdb
+# 本地数据库存放目录
+dir ./
+
+#AOF持久化
+# 指定是否在每次更新操作后进行日志记录
+appendonly no
+# 指定更新文件
+appendfilename appendonly.aof
+# 指定更新日志的条件：
+# no:表示等待操作系统同步到磁盘
+# always:表示每次操作后手动调用fsync()将数据写入到磁盘
+# everysec:表示每秒写入一次
+appendfsync everysec
+# 当前写入日志文件的大小超过上一次rewrite之后的文件大小的百分之100时就是2倍时触发Rewrite
+auto-aof-rewrite-percentage 100
+# 当前aof文件大于多少字节后才触发
+auto_aofrewrite_min_size 64mb
+```
+
+### 运行时
+使用info命令可查看redis运行状态
+
+
+```
+"# Server
+redis_version:3.2.100
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:dd26f1f93c5130ee
+redis_mode:standalone
+os:Windows  
+arch_bits:64
+# 时间处理机制
+multiplexing_api:WinSock_IOCP
+# 进程ID
+process_id:3056
+run_id:8d672667938de33108f02731e8d2c434db44fb37
+tcp_port:6379
+uptime_in_seconds:5183826
+uptime_in_days:59
+hz:10
+# 以分钟为单位进行自增的时钟，用于LRU管理
+lru_clock:8181530
+executable:E:\redis\redis-server.exe
+config_file:E:\redis\redis.windows.conf
+
+# Clients
+# 已经连接的客户端
+connected_clients:14
+# 当前连接的客户端中，最长的输出列表
+client_longest_output_list:0
+# 当前连接的客户端中，最长的输出缓存
+client_biggest_input_buf:0
+# 正在等待阻塞命令（BLPOP、BRPOP..）的客户端数量
+blocked_clients:1
+
+# Memory
+# 由redis分配的内存大小（单位byte字节）
+used_memory:685354992
+used_memory_human:653.61M
+# 由操作系统分配的内存大小
+used_memory_rss:685317216
+used_memory_rss_human:653.57M
+# redis消耗的内存峰值
+used_memory_peak:686704336
+used_memory_peak_human:654.89M
+total_system_memory:0
+total_system_memory_human:0B
+used_memory_lua:37888
+used_memory_lua_human:37.00K
+maxmemory:0
+maxmemory_human:0B
+maxmemory_policy:noeviction
+mem_fragmentation_ratio:1.00
+mem_allocator:jemalloc-3.6.0
+
+# Persistence
+# 服务器是否正在载入持久化文件
+loading:0
+# 距离上一次成功创建持久化文件后、经过了多少秒
+rdb_changes_since_last_save:0
+# 服务器是否正在创建RDB为念
+rdb_bgsave_in_progress:0
+# 最近一次创建RDB文件的时间戳
+rdb_last_save_time:1618772984
+# 最近一次创建RDB文件状态
+rdb_last_bgsave_status:ok
+# 最近一次创建RDB文件耗费的时间
+rdb_last_bgsave_time_sec:20
+# 如果服务器正在创建RDB文件，已经耗费的时间
+rdb_current_bgsave_time_sec:-1
+# AOF持久化是否开启
+aof_enabled:0
+# 是否正在创建AOF文件
+aof_rewrite_in_progress:0
+# RDB文件创建成功后，是否执行AOF
+aof_rewrite_scheduled:0
+# 最近一次重建AOF文件耗费的时间
+aof_last_rewrite_time_sec:-1
+# 如果服务器正在创建AOF文件，已经耗费的时间
+aof_current_rewrite_time_sec:-1
+# 最后一次重写AOF状态
+aof_last_bgrewrite_status:ok
+# 最后一次写入AOF文件状态
+aof_last_write_status:ok
+# 当前AOF文件大小
+aof_current_size:656454978
+# 最近一次Rewrite执行后AOF文件的大小
+aof_base_size:656318091
+# 是否由Rewrite操作在等待RDB创建后执行
+aof_pending_rewrite:0
+# AOF缓冲区大小
+aof_buffer_length:0
+# AOF Rewrite缓冲区大小
+aof_rewrite_buffer_length:0
+# 等待fsync调用数量
+aof_pending_bio_fsync:0
+# 被延迟的fsync数量
+aof_delayed_fsync:0
+
+# Stats
+# 服务器已经接受的连接数量
+total_connections_received:692
+# 服务器已经执行的命令数量
+total_commands_processed:44101414
+# 服务器每秒执行命令的数量
+instantaneous_ops_per_sec:35
+# 服务器启动以来，输入的流量
+total_net_input_bytes:4657980478
+# 服务器启动以来，输出的流量
+total_net_output_bytes:2506494805
+# 输入的流量速度每秒
+instantaneous_input_kbps:3.42
+# 输出的流量速度每秒
+instantaneous_output_kbps:0.14
+# 因为最大客户端数量被拒绝连接的请求数量
+rejected_connections:0
+sync_full:0
+sync_partial_ok:0
+sync_partial_err:0
+# 因为过期被自动删除的key数量
+expired_keys:5439
+# 因为超过最大内存而被驱逐的key数量
+evicted_keys:0
+# 查找key成功的次数
+keyspace_hits:348020
+# 查找key失败的次数
+keyspace_misses:19259073
+pubsub_channels:0
+pubsub_patterns:0
+# 最近一次fork操作耗费的毫秒数
+latest_fork_usec:28317
+migrate_cached_sockets:0
+
+# Replication
+# 集群部署时的角色
+role:master
+# 连接的Slave数量
+connected_slaves:0
+master_repl_offset:0
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+# CPU
+# 耗费的服务器CPU
+used_cpu_sys:1386.75
+# 耗费的用户CPU
+used_cpu_user:1752.73
+# 后台进程耗费的服务器CPU
+used_cpu_sys_children:0.00
+# 后台进程耗费的用户CPU
+used_cpu_user_children:0.00
+
+# Cluster
+cluster_enabled:0
+
+# Keyspace
+db15:keys=398738,expires=383568,avg_ttl=2132465835813
+"
+```
+
+### RDM
+https://redisdesktop.oss-cn-hangzhou.aliyuncs.com/windows/rdm-2021.3.332.exe
+
+https://snapcraft.io/redis-desktop-manager
+
+https://redisdesktop.oss-cn-hangzhou.aliyuncs.com/macos/rdm-2021.3.323.dmg

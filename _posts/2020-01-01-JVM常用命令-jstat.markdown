@@ -1,0 +1,116 @@
+---
+layout: post
+title:  "JVM命令jstat"
+date:   2020-03-17 08:08:08
+categories: java
+tags: java jvm
+excerpt: JVM命令jstat使用说明
+mathjax: false
+---
+
+* content
+{:toc}
+
+## jps
+
+查看当前运行的java应用
+
+## jstat
+
+#### jstat -class pid（类加载统计）
+
+结果 | 说明
+---|---
+Loaded | 加载class数量
+Bytes | 所占用的空间
+Unloaded | 未加载的数量
+Bytes | 所占用的空间
+Time | 时间
+
+#### jstat -compiler pid（编译统计）
+
+结果 | 说明
+---|---
+Comiled | 编译数量
+Failed | 失败数量
+Invalid | 不可以数量
+Time | 时间
+FailedType | 失败类型
+FailedMethod | 失败方法
+
+#### jstat -gc pid 2000（垃圾回收统计）
+
+结果 | 说明
+---|---
+S0C | 第一个幸存区大小
+S0U | 第二个幸存区大小
+S0U | 第一个幸存区使用大小
+S1U | 第二个幸存区使用大小
+EC | 伊甸园区大小
+EU | 伊甸园区使用大小
+OC | 老年代区大小
+OU | 老年代区使用大小
+MC | 方法区大小
+MU | 方法去使用大小
+CCSC | 压缩类空间大小
+CCSU | 压缩类空间使用大小
+YGC | 年轻代垃圾回收次数
+YGCT | 年轻代垃圾回收消耗时间
+FGC | 老年代垃圾回收次数
+FGCT | 老年代垃圾回收消耗时间
+GCT | 垃圾回收总消耗时间
+
+#### jstat -gccapacity pid 2000（堆内存统计）
+
+#### jstat -gcnew pid 2000（新生代垃圾回收统计）
+
+结果 | 说明
+---|---
+TT | 对象在新生代存活的次数
+MTT | 对象在新生代存活的最大次数
+DSS | 期望的存活区大小
+
+
+#### jstat -gcnewcapacity pid 2000（新生代内存统计）
+
+结果 | 说明
+---|---
+NGCMN | 新生代最小容量
+NGCMX | 新生代最大容量
+NGC | 当前新生代容量
+S0CMX | 最大幸存1区大小
+S0C | 当前幸存1区大小
+S1CMX | 最大幸存2区大小
+S1C | 当前幸存2区大小
+ECMX | 伊甸园最大大小
+
+
+#### jstat -gcold pid 2000（老年代垃圾回收统计）
+
+#### jstat -gcoldcapacity pid 2000（老年代内存统计）
+
+结果 | 说明
+---|---
+OGCMN | 老年代最小容量
+OGCMX | 老生代最大容量
+OGC | 当前老年代大小
+
+#### jstat -gcmetacapacity pid 2000 （元数据内存统计）
+
+#### jstat -gccause pid 2000
+
+#### jstat -gcutil pid 2000（汇总垃圾回收统计）
+
+结果 | 说明
+---|---
+S0 | 幸存1区当前使用比列
+S1 | 幸存2区当前使用比列
+E | 伊甸园使用比例
+O | 老年代使用比列
+M | 元数据区使用比列
+CCS | 压缩使用比列
+YGC | 年轻代垃圾回收次数
+YGCT | 年轻代垃圾回收消耗时间
+FGC | 老年代垃圾回收次数
+FGCT | 老年代垃圾回收消耗时间
+GCT | 垃圾回收总消耗时间

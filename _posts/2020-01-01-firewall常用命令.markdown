@@ -1,0 +1,101 @@
+---
+layout: post
+title:  "Linux Firewall常用命令"
+date:   2020-03-17 08:08:08
+categories: linux
+tags: linux
+excerpt: Linux Firewall常用命令
+mathjax: false
+---
+
+* content
+{:toc}
+
+### systemctl
+systemctl是CenterOS7的服务管理工具中的主要的工具，它融合了之前service和chkconfig于一体
+
+> 常用命令
+
+```shell
+#启动服务
+systemctl start firewalld
+#关闭服务
+systemctl stop firewalld
+#重启服务
+systemctl restart firewalld
+#服务状态
+systemctl status firewalld
+#开机时启动一个服务
+systemctl enable firewalld
+#开机时禁止一个服务
+systemctl disable firewalld
+#查看服务是否开机启动
+systemctl is-enable firewalld
+#查看已启动的服务列表
+systemctl list-unit-files
+#查看启动失败的服务列表
+systemctl --failed
+```
+
+### firewall
+
+firewalld提供动态管理的防火墙，支持网络/防火墙“区域”，为网络及其关联的连接，接口或源分配信任级别
+
+> 常用命令
+
+```shell
+#查看版本
+firewall-cmd --version
+#帮助
+firewall-cmd --help
+#显示状态
+firewall-cmd --state
+#重新载入防火墙配置，当前连接不中断
+firewall-cmd --reload
+#重新载入防火墙配置，当前连接中断
+firewall-cmd --complete-reload
+#查看区域信息
+firewall-cmd --get-active-zones
+#查看指定接口所属区域
+firewall-cmd --get-zone-of-interface=eth0
+#拒绝所有连接
+firewall-cmd --panic-on
+#取消拒绝状态
+firewall-cmd --panic-off
+#查看是否拒绝
+firewall-cmd --query-panic
+#将运行时配置保存为永久配置
+firewall-cmd --runtime-to-permanent
+```
+
+> 服务相关
+
+```shell
+#查看预先定义的服务
+firewall-cmd --get-service
+#已经加入的服务
+firewall-cmd --list-service
+#添加服务
+firewall-cmd --zone=public --add-service=smtp --permanent
+#禁用服务
+firewall-cmd --zone=public --remove-service=smtp --permanent
+```
+
+> 端口相关
+
+```shell
+#开启一个端口（--permanent代表永久生效，没有此参数重启后失效）
+firewall-cmd --zone=public --add-port=21/tcp --permanent
+#查看
+firewall-cmd --zone=public --query-port=80/tcp
+#删除
+firewall-cmd --zone=public --remove-port=3306/tcp --permanent
+#查看所有已打开的端口
+firewall-cmd --zone=public --list-ports
+```
+
+> 接口相关
+
+```shell
+
+```

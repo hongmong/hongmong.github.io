@@ -1,0 +1,227 @@
+---
+layout: post
+title:  "Lisp学习笔记-语法篇"
+date:   2021-01-01 08:08:08
+categories: lisp
+tags: lisp
+excerpt: 优美的Lisp语言
+mathjax: false
+---
+
+* content
+{:toc}
+
+### 变量
+
+#### 局部变量
+
+```lisp
+(let ((x 'a) (y 'b)) 
+    (format t "x = ~a y = ~a" x y))
+(prog ((x '(a b c)) (y '(d e f)))
+    (format t "x = ~a y = ~a" x y))
+```
+
+#### 全局变量
+
+```lisp
+(defconstant PI 3.1415926)
+(defun area(rad)
+    (format t "Radius: ~5f" rad)
+    (format t "Area: ~10f" (* rad PI)))
+(area 10)
+```
+
+### 运算
+
+```lisp
+(setq x 10)
+(setq y 3)
+(format t "~% x + y = ~d" (+ x y))
+(format t "~% x - y = ~d" (- x y))
+(format t "~% x * y = ~d" (* x y))
+(format t "~% x / y = ~d" (/ x y))
+(format t "~% Increment x by 3 = ~d" (incf x 3))
+(format t "~% Decrement x by 4 = ~d" (decf x 4))
+(format t "~% mod x by y = ~d" (mod x y))
+(format t "~% rem x by y = ~d" (rem x y))
+
+(setq x 10)
+(setq y 23)
+(format t "~% x == y = ~a" (= x y))
+(format t "~% x != y = ~a" (/= x y))
+(format t "~% x > y = ~a" (> x y))
+(format t "~% x < y = ~a" (< x y))
+(format t "~% x y max is ~d" (max x y))
+(format t "~% x y min is ~d" (min x y))
+
+(format t "~% x and y is ~a" (and x y))
+(format t "~% x or y is ~a" (or x y))
+(format t "~% x not is ~a" (not x))
+(terpri)
+(format t "~% x is max is ~a" (= x (max x y)))
+```
+
+### 条件分支
+
+
+```lisp
+(setq x 3)
+(cond ((<= x 10) (format t "x <= 10"))
+      ((<= x 20) (format t "x <= 20"))
+      (t (format t "t > 20")))
+
+(if (< x 20)
+    (format t "~d < 20" x)
+    (format t "~d > 20" x))
+
+(when (< x 20)
+    (format t "~d < 20" x))
+
+(case x 
+    (1 (format t "一"))
+    (2 (format t "二"))
+    (3 (format t "三"))
+    (4 (format t "四"))
+    (5 (format t "五"))
+    (6 (format t "六"))
+    (t (format t "Other")))
+```
+
+### 循环
+
+```lisp
+(setq x 10)
+(loop (setq x (+ x 1))
+    (write x)
+    (terpri)
+    (when (> x 20)(return x)))
+
+(loop for c in '(hello world)
+    do (format t " ~s" c))
+
+(loop for i from 10 to 20
+    do (print i))
+
+(loop for i from 10 to 20 
+    if(evenp i)
+    do(print i))
+
+(do ((x 0 (+ x 2)) (y 20 (- y 2)))
+    ((= x y) (- x y))
+    (format t "~% x = ~d y = ~d" x y))
+
+(dotimes (n 11)
+    (print n)
+    (write (* n n)))
+
+(setq list '(1 4 8))
+(dolist (n list)
+    (format t "number is ~d" n))
+```
+
+### 宏
+
+```lisp
+(defmacro setTo10(num)
+    (setq num 10)
+    (print num))
+(setq x 25)
+(print x)
+(setTo10 x)
+```
+
+
+### 函数
+
+```lisp
+(defun add (x y) (+ x y))
+(write (add 1 2))
+
+(write ((lambda (a b c) (+ a b c)) 1 2 3))
+(write (mapcar '1+ '(1 2 3)))
+(write (mapcar #'(lambda (x) (* x x x)) '(3 4)))
+
+(defun showmembers (&key name age) (write (list name age)))
+(showmembers :name "张三" :age "18")
+
+(defun showmembers (name age &rest other)
+    (write (list name age other)))
+(showmembers "张三" "18" "man" "doctor")
+
+(defun showmembers (name &optional age sex) 
+    (write (list name age sex)))
+(showmembers "张三" "18")
+```
+
+### 数组
+
+```lisp
+(setq mylist (make-array 10))
+(setf (aref mylist 0) 1)
+(write mylist)
+(write (length mylist))
+
+;二维数组
+(setq list (make-array '(4 3)))
+(dotimes (x (array-dimension list 0))
+    (dotimes (y (array-dimension list 1))
+        (setf (aref list x y) (+ x y))))
+(write list)
+```
+
+### 定义结构
+
+```lisp
+(defstruct person name age sex)
+(setq zhangsan (make-person :name "张三" :age 18 :sex "男"))
+(write zhangsan)
+(setf (person-age zhangsan) 19)
+(write zhangsan)
+```
+
+### 包
+
+```lisp
+(make-package :tom)
+(make-package :dick)
+
+(in-package tom)
+(defun hello() (print "hello this is tom"))
+
+(in-package dick)
+(defun hello() (print "hello this is dick"))
+
+(in-package dick)
+(hello)
+; (delete-package tom)
+(in-package tom)
+(hello)
+
+```
+
+### 类
+
+```lisp
+(defclass Box () 
+    ((blength :accessor blength)
+    (width :accessor width)
+    (heigth :accessor heigth)
+    (volume :reader volume)))
+
+(defclass ColorBox(Box)
+    ((color :accessor color)))
+
+(defmethod volume ((object Box))
+    (* (blength object) (width object) (heigth object)))
+
+(setf item (make-instance 'ColorBox))
+(setf (blength item) 10)
+(setf (width item) 5)
+(setf (heigth item) 6)
+(setf (color item) "red")
+(format t "~%length is ~d" (blength item))
+(format t "~%width is ~d" (width item))
+(format t "~%color is ~s" (color item))
+(format t "~%volume is ~d" (volume item))
+```

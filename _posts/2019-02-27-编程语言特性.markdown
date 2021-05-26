@@ -5,7 +5,7 @@ date:   2019-02-27 08:08:08
 categories: language
 tags: language
 excerpt: 编程语言的语言特性
-mathjax: true
+mathjax: false
 ---
 
 * content

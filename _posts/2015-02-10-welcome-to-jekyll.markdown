@@ -5,7 +5,7 @@ date:   2015-02-10 15:14:54
 categories: other
 tags: other
 excerpt: 我的第一篇博客！
-mathjax: true
+mathjax: false
 ---
 
 * content
